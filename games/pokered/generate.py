@@ -83,9 +83,11 @@ def render(rel, a):
 
 
 def load_drawers():
-    for mod in ("font", "tilesets", "sprites", "misc", "pics"):
-        if os.path.exists(os.path.join(HERE, "art", mod + ".py")):
+    for mod in sorted(f[:-3] for f in os.listdir(os.path.join(HERE, "art")) if f.endswith(".py") and f not in ("__init__.py", "tilekit.py")):
+        try:
             __import__(f"games.pokered.art.{mod}")
+        except Exception as e:                      # one broken module must not stop the others
+            print(f"  ART MODULE FAILED: {mod}: {type(e).__name__}: {e}")
 
 
 def main(tree, only=None):
