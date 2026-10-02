@@ -173,9 +173,27 @@ def intro_gengar(rel, a):
     """Three poses side by side. The second tile of the first column is not part of the
     figure: the intro uses it (tile 1) as the solid black of the letterbox bars."""
     b = briefs().get(rel)
-    out = render(a, b) if b else drawn.autoshade(gfx.unpack_mask(a["sil"], a["h"], a["w"]), a["grid"])
+    inside = gfx.unpack_mask(a["sil"], a["h"], a["w"])
+    # a black shadow figure: the build de-duplicates this picture's tiles, and a flat body keeps
+    # the tiles that must be equal looking the same
+    out = render(a, b) if b else np.where(inside, 3, 0).astype(np.uint8)
     out[8:16, 0:8] = 3
     return out
+
+
+@drawer("trade/game_boy.png")
+def trade_handheld(rel, a):
+    """A handheld console of our own design for the trade animation (48x64)."""
+    c = C(a["w"], a["h"])
+    c.frame(1, 1, 47, 63, 3, fill=1)
+    c.frame(6, 6, 42, 30, 3, fill=2)            # screen bezel
+    c.frame(10, 9, 38, 27, 3, fill=0)           # screen
+    c.rect(10, 42, 13, 51, 3); c.rect(7, 45, 16, 48, 3)      # d-pad
+    c.ellipse(33, 48, 3, 3, 3); c.ellipse(40, 44, 3, 3, 3)   # buttons
+    c.line(20, 56, 23, 54, 3); c.line(26, 56, 29, 54, 3)     # start / select
+    for k in range(3):
+        c.line(36 + k * 3, 60, 39 + k * 3, 55, 2)            # speaker
+    return c.a
 
 
 @drawer("pokemon/*/*.png")

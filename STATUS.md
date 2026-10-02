@@ -31,9 +31,9 @@ _Updated 2026-10-02 (first night)._
 | 67 overworld sprites | kept transparency mask + our own per-character stamps for every frame (`sprite_briefs.json`, recipes in `sprite_recipes/`) |
 | UI / title / town map / pokedex / slots / SGB border sheets | own drawings, text re-typeset (`art/misc.py`) |
 | 151 Pokemon front + back, 2 fossils | all drawn from briefs (`games/pokered/briefs/mon_*.json`), two passes: 242 of 304 pictures redrawn from our own shapes in the second pass |
-| 45 trainers, player, old man, ghost, intro Nidorino/Jigglypuff, title player | drawn from briefs (`briefs/people.json`), first pass |
-| Intro Gengar (3 poses), trade Game Boy | silhouette + coarse shading (de-duplicated tile pictures: brief still to do) |
-| Battle effects, party icons, badges, slot symbols | silhouette (real sprite alpha) + coarse shading |
+| 45 trainers, player, old man, ghost, intro Nidorino/Jigglypuff, title player | drawn from briefs (`briefs/people.json`), two passes |
+| Intro Gengar (3 poses), trade Game Boy | Gengar is a black shadow figure on the kept silhouette; the handheld is our own drawing (both de-duplicated tile pictures, so tiles that must be equal limit the detail) |
+| Battle effects, party icons, badges and leader faces, slot symbols | sprite transparency kept + inner drawing from briefs (`briefs/small.json`) |
 
 ## Decisions (for review)
 
@@ -67,11 +67,9 @@ _Updated 2026-10-02 (first night)._
 
 ## Next
 
-1. Second pass on trainers (running) and briefs for party icons, badges, slot symbols, battle effects (running).
-2. Intro Gengar poses and trade Game Boy: these two are de-duplicated tile pictures (the code's tilemaps index
-   them); drawing them freely needs our own tilemaps too. Still coarse silhouettes.
-3. Weak Pokemon named by the helpers (alakazam, arcanine, flareon, dewgong, golduck, gyarados, moltres, tauros,
-   tentacool, several backs): third pass.
+1. Third pass on the weak Pokemon named by the helpers and on plain backs (running).
+2. Intro Gengar and trade handheld with eyes/details: needs our own tilemaps for the de-duplicated tiles.
+3. Unidentified pieces: some slot reel fragments and battle effect shapes only got generic shading.
 4. Longer scripted play test (`games/pokered/walk_test.py` reaches Pallet Town; extend to Route 1, a wild battle,
    Pokemon Center, Mart).
 
