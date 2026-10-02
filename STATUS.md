@@ -2,6 +2,10 @@
 
 _Updated 2026-10-02 (first night)._
 
+**PUBLISHED**: https://andrewnakas.github.io/pokered-cleanroom/ (repo https://github.com/andrewnakas/pokered-cleanroom,
+`main` + `gh-pages`). Live page checked in headless Edge: boots, picture, sound, input. Update with
+`sh tools/publish.sh push "message"` (rebuilds, refuses to push unless the taint scan prints FAILING: 0).
+
 ## What works
 
 - **Round trip**: the untouched pret/pokered clone builds `pokered.gbc` / `pokeblue.gbc` with the sha1s in
@@ -26,8 +30,9 @@ _Updated 2026-10-02 (first night)._
 | 19 tilesets (overworld + 18) | every tile redrawn from what it is (`art/ts_*.py`), by me (overworld) and helper agents |
 | 67 overworld sprites | kept silhouette + drawn bands, faces, arms (`art/sprites.py`); things (ball, boulder, ...) drawn |
 | UI / title / town map / pokedex / slots / SGB border sheets | own drawings, text re-typeset (`art/misc.py`) |
-| 151 Pokemon front + back, 2 fossils | **in progress**: briefs in `games/pokered/briefs/mon_*.json` (six helpers) |
-| 45 trainers, player, intro and title figures | silhouette + coarse shading only so far; briefs next |
+| 151 Pokemon front + back, 2 fossils | all drawn from briefs (`games/pokered/briefs/mon_*.json`); second (quality) pass running |
+| 45 trainers, player, old man, ghost, intro Nidorino/Jigglypuff, title player | drawn from briefs (`briefs/people.json`), first pass |
+| Intro Gengar (3 poses), trade Game Boy | silhouette + coarse shading (de-duplicated tile pictures: brief still to do) |
 | Battle effects, party icons, badges, slot symbols | silhouette (real sprite alpha) + coarse shading |
 
 ## Decisions (for review)
@@ -62,10 +67,10 @@ _Updated 2026-10-02 (first night)._
 
 ## Next
 
-1. Merge the six Pokemon brief files, review contact sheets, fix the weak ones.
-2. Briefs for trainers, player (front/back), intro Nidorino/Jigglypuff/Gengar, title player, old man, ghost.
-3. Sprite briefs (hats, hair styles) for the story characters; battle effect and party icon touch-ups.
-4. Publish (repo + gh-pages), poster, then keep improving in loops.
+1. Second pass on the weakest Pokemon pictures (running), then trainers.
+2. Sprite briefs (hats, hair styles) for the story characters (running: `games/pokered/sprite_briefs.json`).
+3. Intro Gengar poses and trade Game Boy drawn from briefs; battle effects, party icons, badges touch-ups.
+4. A longer scripted play test (first route, first battle, Pokemon Center, Mart) in PyBoy and on the live page.
 
 ## For the morning
 

@@ -5,6 +5,7 @@ and the 4x4 shade grid of that frame, then given drawn features: people get a fa
 Frame order in a strip: stand down, up, left, then walk down, up, left.
 Sprite shades: 0 transparent, 1 light (skin), 2 dark, 3 black.
 """
+import json
 import os
 
 import numpy as np
@@ -150,6 +151,36 @@ OPTS = {
 }
 
 
+_SB = None
+
+
+def sprite_briefs():
+    """games/pokered/sprite_briefs.json: our own per-character drawing on top of the bands.
+       {"oak": {"opts": {"hair": 2, "top": 1, "legs": 2, "glasses": false, "beard": false},
+                "down": [16 rows of 16 chars], "up": [...], "side": [...],
+                "walk_down": [...], "walk_up": [...], "walk_side": [...]}}
+    Stamp characters: ' ' keep what is there, '.' white, '-' light grey, '#' black (as seen on
+    screen). Stamps are clipped to the kept silhouette. Without walk_* stamps the walking frames
+    take the first 10 rows (the head) of the standing stamp of the same direction."""
+    global _SB
+    if _SB is None:
+        p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "sprite_briefs.json")
+        try:
+            _SB = json.load(open(p, encoding="utf-8")) if os.path.exists(p) else {}
+        except Exception as e:
+            print(f"  SPRITE BRIEFS FAILED: {e}")
+            _SB = {}
+    return _SB
+
+
+def stamp(f, m, rows, limit=16):
+    for j, row in enumerate(rows[:limit]):
+        for i, ch in enumerate(row[:16]):
+            if ch != " " and m[j, i]:
+                f[j, i] = {".": 1, "-": 2, "#": 3}[ch]
+    return f
+
+
 @drawer("sprites/*.png")
 def sprite(rel, a):
     name = os.path.basename(rel)[:-4]
@@ -157,7 +188,16 @@ def sprite(rel, a):
     inside = gfx.unpack_mask(a["sil"], h, w)
     out = np.zeros((h, w), np.uint8)
     fn = THINGS.get(name, person)
+    b = sprite_briefs().get(name, {})
+    opts = dict(OPTS.get(name, {}), **b.get("opts", {}))
     for n, y in enumerate(range(0, h, 16)):
-        out[y:y + 16] = fn(inside[y:y + 16], a["grid"][n], FACING[n % 6], OPTS.get(name, {}))
+        m = inside[y:y + 16]
+        f = fn(m, a["grid"][n], FACING[n % 6], opts)
+        face = FACING[n % 6]
+        if n >= 3 and ("walk_" + face) in b:
+            f = stamp(f, m, b["walk_" + face])
+        elif face in b:
+            f = stamp(f, m, b[face], 16 if n < 3 else 10)
+        out[y:y + 16] = f
     out[~inside] = 0
     return out
