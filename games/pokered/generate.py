@@ -16,14 +16,7 @@ from cleanroom.gb import gfx
 from games.pokered import drawn
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DRAWERS = []          # (pattern, function(rel, spec) -> idx array or None)
-
-
-def drawer(pattern):
-    def reg(fn):
-        DRAWERS.append((pattern, fn))
-        return fn
-    return reg
+from games.pokered.art import DRAWERS
 
 
 def draw_pic(rel, a):
@@ -90,12 +83,9 @@ def render(rel, a):
 
 
 def load_drawers():
-    for mod in ("font", "hud", "tilesets", "sprites", "misc", "pics"):
-        try:
+    for mod in ("font", "tilesets", "sprites", "misc", "pics"):
+        if os.path.exists(os.path.join(HERE, "art", mod + ".py")):
             __import__(f"games.pokered.art.{mod}")
-        except ModuleNotFoundError as e:
-            if f"art.{mod}" not in str(e) and "games.pokered.art" not in str(e):
-                raise
 
 
 def main(tree, only=None):
