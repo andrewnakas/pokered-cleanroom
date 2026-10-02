@@ -28,9 +28,9 @@ _Updated 2026-10-02 (first night)._
 |---|---|
 | Font, text frame, HP bar, battle HUD | own design (`art/font.py`) |
 | 19 tilesets (overworld + 18) | every tile redrawn from what it is (`art/ts_*.py`), by me (overworld) and helper agents |
-| 67 overworld sprites | kept silhouette + drawn bands, faces, arms (`art/sprites.py`); things (ball, boulder, ...) drawn |
+| 67 overworld sprites | kept transparency mask + our own per-character stamps for every frame (`sprite_briefs.json`, recipes in `sprite_recipes/`) |
 | UI / title / town map / pokedex / slots / SGB border sheets | own drawings, text re-typeset (`art/misc.py`) |
-| 151 Pokemon front + back, 2 fossils | all drawn from briefs (`games/pokered/briefs/mon_*.json`); second (quality) pass running |
+| 151 Pokemon front + back, 2 fossils | all drawn from briefs (`games/pokered/briefs/mon_*.json`), two passes: 242 of 304 pictures redrawn from our own shapes in the second pass |
 | 45 trainers, player, old man, ghost, intro Nidorino/Jigglypuff, title player | drawn from briefs (`briefs/people.json`), first pass |
 | Intro Gengar (3 poses), trade Game Boy | silhouette + coarse shading (de-duplicated tile pictures: brief still to do) |
 | Battle effects, party icons, badges, slot symbols | silhouette (real sprite alpha) + coarse shading |
@@ -67,14 +67,18 @@ _Updated 2026-10-02 (first night)._
 
 ## Next
 
-1. Second pass on the weakest Pokemon pictures (running), then trainers.
-2. Sprite briefs (hats, hair styles) for the story characters (running: `games/pokered/sprite_briefs.json`).
-3. Intro Gengar poses and trade Game Boy drawn from briefs; battle effects, party icons, badges touch-ups.
-4. A longer scripted play test (first route, first battle, Pokemon Center, Mart) in PyBoy and on the live page.
+1. Second pass on trainers (running) and briefs for party icons, badges, slot symbols, battle effects (running).
+2. Intro Gengar poses and trade Game Boy: these two are de-duplicated tile pictures (the code's tilemaps index
+   them); drawing them freely needs our own tilemaps too. Still coarse silhouettes.
+3. Weak Pokemon named by the helpers (alakazam, arcanine, flareon, dewgong, golduck, gyarados, moltres, tauros,
+   tentacool, several backs): third pass.
+4. Longer scripted play test (`games/pokered/walk_test.py` reaches Pallet Town; extend to Route 1, a wild battle,
+   Pokemon Center, Mart).
 
 ## For the morning
 
 - Play: https://andrewnakas.github.io/pokered-cleanroom/ once published (see top of this file for a BLOCKED note if not).
-- Look at: `D:/n64work/pokered/sheets/` contact sheets (`c_*` = ours).
+- Look at: `D:/n64work/pokered/sheets/c_all_front.png` (all 151 fronts), `c_ppl.png` (trainers), `c_spr.png` (sprites),
+  `c_walk.png` (play test), `poster.png` in the repo.
 - Nothing needed from you. The ROM you downloaded was not required (the pret tree already has every asset) but it
   confirmed the round-trip hash.
