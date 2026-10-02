@@ -30,6 +30,9 @@ PIC = ("pokemon/front/", "pokemon/back/", "trainers/", "player/", "battle/oldman
        "trade/bubble", "trade/cable_ball", "trade/link_cable", "trainer_card/badges", "slots/red_slots_2",
        "slots/blue_slots_2", "splash/falling_star")
 TRIM = ("tilesets/", "slots/red_slots_1", "slots/blue_slots_1", "battle/move_anim_")   # trailing blank tiles are trimmed
+# drawn on a white background (no real transparency): their silhouette is closed and coarsened;
+# the rest are sprite sheets whose shade 0 is real transparency (kept as the 1-bit alpha)
+FIGURE = ("pokemon/", "trainers/", "player/", "battle/oldmanb", "battle/ghost", "intro/", "title/player")
 DEDUPE = ("intro/gengar", "trade/game_boy")
 
 
@@ -39,6 +42,29 @@ def kind_of(rel):
     if rel.startswith(PIC):
         return "pic"
     return "sheet"
+
+
+def dilate(m, r):
+    for _ in range(r):
+        p = np.pad(m, 1, constant_values=False)
+        m = p[1:-1, 1:-1] | p[:-2, 1:-1] | p[2:, 1:-1] | p[1:-1, :-2] | p[1:-1, 2:]
+    return m
+
+
+def silhouette(idx, r=3):
+    """Inside of a figure drawn on white. The retail line art often leaves the outline open
+    where a white body meets the white background, so gaps up to 2r pixels are closed:
+    the ink is grown by r, the outside is flooded from the border, then grown back by r."""
+    ink = idx != 0
+    grown = dilate(ink, r)
+    pad = np.pad(grown, r + 1, constant_values=False)          # room to flood around figures that touch the border
+    out = gfx.flood_outside((pad).astype(np.uint8))
+    out = dilate(out, r)[r + 1:-(r + 1), r + 1:-(r + 1)]
+    inside = ~(out & ~ink)
+    # drop what is only a line (whiskers, motion marks, open outline strokes): a part survives
+    # if it is at least 2 pixels thick somewhere near, so no retail line art is carried over
+    core = ~dilate(~inside, 1)
+    return inside & dilate(core, 2)
 
 
 def grid4(idx, inside):
@@ -71,7 +97,7 @@ def main(tree):
         kind = kind_of(rel)
         a = {"w": w, "h": h, "depth": 1 if "1bpp" in built else 2, "kind": kind}
         if kind == "pic":
-            inside = ~gfx.flood_outside(idx)
+            inside = silhouette(idx) if rel.startswith(FIGURE) else ~gfx.flood_outside(idx)
             a["grid"] = grid4(idx, inside)
             a["sil"] = gfx.pack_mask(inside)
         elif kind == "sprite":

@@ -10,7 +10,7 @@ from games.pokered.art.ts_reds_house import BLACK, WALL, WHITE, cv, mat, pc
 WALK = (0x0f, 0x1a, 0x1f, 0x26, 0x28, 0x29, 0x2c, 0x2d, 0x2e, 0x2f, 0x41)
 
 PLAIN = WHITE                                               # white floor square
-TILE = tex(lambda x, y: 0 if x == 0 or y == 0 else (1 if (x + y) % 2 else 0) if (x in (1, 7) or y in (1, 7)) else 1)
+TILE = tex(lambda x, y: 1 if (x in (1, 6) and 1 <= y <= 6) or (y in (1, 6) and 1 <= x <= 6) or (x, y) == (3, 3) else 0)
 MARK = 2                                                    # shade of the lines painted on the floor
 
 
@@ -72,19 +72,19 @@ def board():
 
 
 def trade_machine():
-    """Link machine: a console either side of a domed centre column, 4 x 2 on the white floor."""
-    c = cv(PLAIN, 32, 16)
-    c.rect(0, 12, 32, 16, 2); c.frame(0, 11, 32, 16, 3)
+    """Link machine: a console either side of a tall domed column, 4 x 3 on the white floor
+    (only the column reaches into the top row)."""
+    c = cv(PLAIN, 32, 24)
+    c.rect(0, 20, 32, 24, 2); c.frame(0, 19, 32, 24, 3)
     for x0 in (1, 21):
-        c.frame(x0, 3, x0 + 10, 12, 3, fill=1)
-        c.frame(x0 + 2, 5, x0 + 8, 9, 3, fill=0); c.px(x0 + 3, 6, 1)
-        c.px(x0 + 2, 10, 3); c.px(x0 + 4, 10, 0); c.px(x0 + 6, 10, 0)
+        c.frame(x0, 11, x0 + 10, 20, 3, fill=1)
+        c.frame(x0 + 2, 13, x0 + 8, 17, 3, fill=0); c.px(x0 + 3, 14, 1)
+        c.px(x0 + 2, 18, 3); c.px(x0 + 4, 18, 0); c.px(x0 + 6, 18, 0)
     y, x = c.grid()
-    col = ((abs(x - 15.5) <= 3.5) & (y >= 4) & (y <= 13)) | c.emask(16, 4.5, 4, 4)
+    col = ((abs(x - 15.5) <= 4.5) & (y >= 6) & (y <= 21)) | c.emask(16, 6.5, 5, 5)
     c.blob(col, 1.2, 1.0)
-    c.hline(8, 13, 19, 3); c.hline(13, 12, 20, 3)
-    c.px(15, 2, 0); c.px(16, 10, 0); c.px(15, 10, 0)
-    c.hline(7, 11, 12, 2); c.hline(7, 20, 21, 2)
+    c.hline(10, 12, 20, 3); c.hline(16, 12, 20, 3); c.hline(21, 11, 21, 3)
+    c.px(15, 4, 0); c.px(14, 13, 0); c.px(17, 13, 3); c.px(14, 18, 3); c.px(17, 18, 0)
     return c
 
 
@@ -146,13 +146,10 @@ def build():
     T[0x2E] = tex(lambda x, y: MARK if x in (1, 2) else 0)
     T[0x2F] = tex(lambda x, y: MARK if x in (5, 6) else 0)
     # machines and seats
-    put(T, trade_machine(), [[0x3B, 0x3C, 0x3D, 0x3E], [0x37, 0x38, 0x39, 0x3A]])
+    put(T, trade_machine(), [[None, 0x40, 0x41, None], [0x3B, 0x3C, 0x3D, 0x3E], [0x37, 0x38, 0x39, 0x3A]])
     put(T, battle_table(), [[0x47, 0x48, 0x49, 0x4A]])
     put(T, seat(True), [[0x20, 0x21], [0x22, 0x23], [0x24, 0x25], [0x26, 0x27]])
     put(T, seat(False), [[None, None], [None, None], [0x2A, 0x2B], [None, None]])
-    c = cv(PLAIN, 16, 8)                                    # way-out marker at the foot of the room
-    c.poly([(8, 7), (3, 2), (13, 2)], 2, outline=3); c.hline(0, 2, 14, 2)
-    put(T, c, [[0x40, 0x41]])
     return T
 
 
