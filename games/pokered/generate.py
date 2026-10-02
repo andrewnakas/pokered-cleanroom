@@ -45,6 +45,34 @@ def draw_sheet(rel, a):
     return out
 
 
+def load_salts():
+    p = os.path.join(HERE, "salts.json")
+    return json.load(open(p)) if os.path.exists(p) else {}
+
+
+def stipple(rel, a, idx, salts):
+    """Tiles listed in salts.json (tile numbers reported by the taint scan as equal to a
+    retail tile by chance) get a sparse texture mark inside the figure so they differ.
+    The list holds tile numbers and a variant counter only."""
+    todo = salts.get(rel)
+    if not todo or "sil" not in a:
+        return idx
+    inside = gfx.unpack_mask(a["sil"], a["h"], a["w"])
+    d = drawn.depth_map(inside, edge_inside=False)
+    out = idx.copy()
+    floor = 1 if a["kind"] == "sprite" else 0
+    mod = 11 if a["kind"] == "sprite" else 7
+    for tile, n in todo.items():
+        tile = int(tile)
+        ty, tx = (tile // (a["w"] // 8)) * 8, (tile % (a["w"] // 8)) * 8
+        for y in range(ty, min(ty + 8, a["h"])):
+            for x in range(tx, tx + 8):
+                if d[y, x] >= 2 and (x * 3 + y * 5 + n) % mod == 0:
+                    v = out[y, x]
+                    out[y, x] = 2 if v in (1, 3) else (1 if v == 2 else max(1, floor))
+    return out
+
+
 def constrain(rel, a, idx):
     """Layout facts the build depends on: blank tiles stay blank, drawn tiles stay
     drawn, and de-duplicated pictures keep their tile equalities."""
@@ -93,13 +121,15 @@ def load_drawers():
 def main(tree, only=None):
     spec = json.load(open(os.path.join(HERE, "spec", "assets.json")))
     load_drawers()
+    salts = load_salts()
     by = {}
     for rel, a in spec.items():
         if only and not fnmatch.fnmatch(rel, only):
             continue
         idx, who = render(rel, a)
         assert idx.shape == (a["h"], a["w"]), (rel, idx.shape)
-        idx = constrain(rel, a, np.asarray(idx, np.uint8))
+        idx = stipple(rel, a, np.asarray(idx, np.uint8), salts)
+        idx = constrain(rel, a, idx)
         p = os.path.join(tree, "gfx", rel)
         os.makedirs(os.path.dirname(p), exist_ok=True)
         gfx.write_png(p, idx, a["depth"])

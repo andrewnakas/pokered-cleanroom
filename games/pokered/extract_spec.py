@@ -24,7 +24,12 @@ from cleanroom.gb import gfx
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 PIC = ("pokemon/front/", "pokemon/back/", "trainers/", "player/", "battle/oldmanb", "battle/ghost",
-       "intro/", "title/player", "trade/game_boy")
+       "intro/", "title/player", "trade/game_boy",
+       # sheets of separate drawn subjects (effects, icons, symbols), not glyphs or map tiles
+       "icons/", "battle/move_anim_", "overworld/red_fish_", "overworld/fishing_rod", "overworld/smoke",
+       "trade/bubble", "trade/cable_ball", "trade/link_cable", "trainer_card/badges", "slots/red_slots_2",
+       "slots/blue_slots_2", "splash/falling_star")
+TRIM = ("tilesets/", "slots/red_slots_1", "slots/blue_slots_1", "battle/move_anim_")   # trailing blank tiles are trimmed
 DEDUPE = ("intro/gengar", "trade/game_boy")
 
 
@@ -75,6 +80,7 @@ def main(tree):
             a["sil"] = gfx.pack_mask(inside)
         else:
             a["grid"] = grid4(idx, np.ones_like(idx, bool))
+        if rel.startswith(TRIM):
             a["blank"] = [int(i) for i, t in enumerate(gfx.tiles(idx)) if not t.any()]
         if rel.startswith(DEDUPE):
             seen, cls = {}, []

@@ -38,7 +38,7 @@ G = {
     "b": "10000/10000/10110/11001/10001/10001/11110",
     "c": "00000/00000/01110/10000/10000/10001/01110",
     "d": "00001/00001/01101/10011/10001/10001/01111",
-    "e": "00000/00000/01110/10001/11111/10000/01110",
+    "e": "00000/00000/01110/10001/11110/10000/01111",
     "f": "00110/01001/01000/11100/01000/01000/01000",
     "g": "00000/00000/01111/10001/10001/01111/00001/01110",
     "h": "10000/10000/10110/11001/10001/10001/10001",
@@ -52,14 +52,14 @@ G = {
     "p": "00000/00000/11110/10001/10001/11110/10000/10000",
     "q": "00000/00000/01111/10001/10001/01111/00001/00001",
     "r": "00000/00000/10110/11001/10000/10000/10000",
-    "s": "00000/00000/01111/10000/01110/00001/11110",
+    "s": "00000/00000/01110/10000/01110/00001/01110",
     "t": "01000/01000/11100/01000/01000/01001/00110",
     "u": "00000/00000/10001/10001/10001/10011/01101",
     "v": "00000/00000/10001/10001/10001/01010/00100",
     "w": "00000/00000/10001/10001/10101/10101/01010",
     "x": "00000/00000/10001/01010/00100/01010/10001",
     "y": "00000/00000/10001/10001/10001/01111/00001/01110",
-    "z": "00000/00000/11111/00010/00100/01000/11111",
+    "z": "00000/00000/11111/00010/01110/01000/11111",
     "0": "01110/10001/10011/10101/11001/10001/01110",
     "1": "00100/01100/00100/00100/00100/00100/01110",
     "2": "01110/10001/00001/00010/00100/01000/11111",
@@ -86,7 +86,7 @@ G = {
     "/": "00001/00001/00010/00100/01000/10000/10000",
     "x_times": "00000/10001/01010/00100/01010/10001",
     "male": "00111/00011/00101/01100/10010/10010/01100",
-    "female": "01110/10001/10001/01110/00100/01110/00100",
+    "female": "01110/10001/10001/01110/00100/11111/00100",
     "money": "01110/01001/01001/11110/01000/11110/01000",
     "tri_open": "10000/11000/10100/10010/10100/11000/10000",
     "tri": "10000/11000/11100/11110/11100/11000/10000",
@@ -112,23 +112,53 @@ SMALL = {"P": "111/101/111/100/100", "K": "101/101/110/101/101", "M": "101/111/1
          "E": "111/100/110/100/111", "t": "010/111/010/010/011", "v": "000/000/101/101/010"}
 
 
-def glyph(name, x=1, y=0):
+# Heavy letters: every glyph is the 5x7 skeleton with doubled upright strokes (6 wide);
+# the few that would clog are drawn by hand, 7 wide.
+WIDE = {
+    "M": "1100011/1110111/1111111/1101011/1100011/1100011/1100011",
+    "W": "1100011/1100011/1100011/1101011/1111111/1110111/1100011",
+    "N": "110011/111011/111111/110111/110011/110011/110011",
+    "m": "0000000/0000000/1110110/1111111/1101011/1101011/1101011",
+    "w": "0000000/0000000/1100011/1101011/1101011/1111111/0110110",
+    "0": "011110/110011/110111/111011/110011/110011/011110",
+}
+THIN = ("tri_open", "tri", "tri_down", "dots", "dot_mid", "x_times", "/", "kana_a", "kana_u", "kana_e",
+        "hira_a", "hira_e", "hira_o", "hira_i", "hira_u", "male", "female", "money")
+
+
+def heavy(name):
+    if name in WIDE:
+        return art(WIDE[name])
+    g = art(G[name], 5)
+    if name in THIN:
+        return g
+    out = np.zeros((g.shape[0], 6), np.uint8)
+    out[:, :5] = g
+    out[:, 1:] |= g
+    return out
+
+
+def glyph(name, x=None, y=0):
     t = np.zeros((8, 8), np.uint8)
-    return blit(t, art(G[name]), x, y)
+    g = heavy(name)
+    return blit(t, g, (0 if g.shape[1] >= 7 else 1) if x is None else x, y)
 
 
 def bold(name):
-    g = art(G[name], 5, 7)
+    """Display capital: the heavy glyph with a grey drop shadow."""
+    g = heavy(name)
     t = np.zeros((8, 8), np.uint8)
-    blit(t, g, 1, 0)
-    blit(t, g, 2, 0, transparent=0)
+    x = 0 if g.shape[1] >= 7 else 1
+    blit(t, (g > 0).astype(np.uint8) * 2, x + 1, 1, transparent=0)
+    blit(t, g, x, 0, transparent=0)
     return t
 
 
 def apostrophe(letter):
     t = np.zeros((8, 8), np.uint8)
-    blit(t, art(G[letter]), 3, 0)
-    t[0, 1] = t[1, 0] = t[0, 0] = 3
+    blit(t, heavy(letter), 2, 0)
+    t[0, 0] = t[0, 1] = t[1, 0] = 3
+    t[0:2, 2:4] = 0
     return t
 
 
@@ -163,22 +193,28 @@ def font(rel, a):
 # ---- text box frame: one thick rounded line -------------------------------------------
 
 def frame(kind):
+    """Text box frame: a 3 pixel band (black, light core, black) at rows/columns 2-4."""
     t = np.zeros((8, 8), np.uint8)
-    hz, vt = slice(3, 5), slice(3, 5)
+    band = (3, 1, 3)
     if kind == "h":
-        t[hz, :] = 3
-    elif kind == "v":
-        t[:, vt] = 3
-    else:
-        top, left = kind[0] == "t", kind[1] == "l"
-        t[hz, 3:8] = 3 if left else 0
-        if not left:
-            t[hz, 0:5] = 3
-        if top:
-            t[3:8, vt] = 3
-        else:
-            t[0:5, vt] = 3
-        t[3 if top else 4, 3 if left else 4] = 0          # rounded corner
+        for k, s in enumerate(band):
+            t[2 + k, :] = s
+        return t
+    if kind == "v":
+        for k, s in enumerate(band):
+            t[:, 2 + k] = s
+        return t
+    top, left = kind[0] == "t", kind[1] == "l"
+    xs = slice(2, 8) if left else slice(0, 5)
+    ys = slice(2, 8) if top else slice(0, 5)
+    for k, s in enumerate(band):
+        t[2 + k, xs] = s
+    for k, s in enumerate(band):
+        t[ys, 2 + k] = s
+    t[2:5, 2:5] = 3
+    t[3, 3] = 1
+    t[3, 4 if left else 2] = 1
+    t[4 if top else 2, 3] = 1
     return t
 
 
@@ -200,8 +236,9 @@ def font_extra(rel, a):
 def bar(fill, left=False, right=None):
     t = np.zeros((8, 8), np.uint8)
     if right is None:
-        t[2, :] = 3; t[5, :] = 3
-        t[3:5, :fill] = 2
+        t[1, :] = 3; t[6, :] = 3
+        t[2:6, :fill] = 2
+        t[2, :fill] = 1
     return t
 
 
@@ -216,16 +253,16 @@ def small_text(a, b, gap=1, y=1):
 def bar_left():
     t = np.zeros((8, 8), np.uint8)
     t[2, 0] = t[4, 0] = 3              # colon after HP
-    t[2:6, 4:6] = 3                    # bar cap
-    t[2, 6:] = 3; t[5, 6:] = 3
-    t[2, 4] = t[5, 4] = 0
+    t[1:7, 4:6] = 3                    # bar cap
+    t[1, 6:] = 3; t[6, 6:] = 3
+    t[1, 4] = t[6, 4] = 0
     return t
 
 
 def bar_right(line):
     t = np.zeros((8, 8), np.uint8)
-    t[2:6, 0:2] = 3
-    t[2, 1] = t[5, 1] = 0
+    t[1:7, 0:2] = 3
+    t[1, 1] = t[6, 1] = 0
     if line:
         t[:, 3:5] = 3
     return t

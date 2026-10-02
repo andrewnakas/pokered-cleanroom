@@ -9,9 +9,10 @@ if [ "$1" = fresh ] || [ ! -d "$W/clean" ]; then
   rm -rf "$W/clean"
   cp -r "$W/pristine" "$W/clean"
   rm -rf "$W/clean/.git"
+  find "$W/clean/gfx" -name '*.png' -delete      # no retail picture stays in the clean tree
 fi
 cd "$W/clean"
-find gfx \( -name '*.png' -o -name '*.2bpp' -o -name '*.1bpp' -o -name '*.pic' \) -delete
+find gfx \( -name '*.2bpp' -o -name '*.1bpp' -o -name '*.pic' \) -delete
 rm -f gfx/*.o pokered.gbc pokeblue.gbc
 (cd "$R" && python -m games.pokered.generate "$W/clean")
 make -j2 red blue > "$W/clean_build.log" 2>&1 || { grep -i -m8 "error\|overflow\|too big" "$W/clean_build.log"; tail -3 "$W/clean_build.log"; exit 1; }
