@@ -71,8 +71,8 @@ _Updated 2026-10-02 (first night)._
 2. Intro Gengar and trade handheld with eyes/details: needs our own tilemaps for the de-duplicated tiles.
 3. Unidentified pieces: some slot reel fragments and battle effect shapes only got generic shading.
 4. Longer scripted play test: `games/pokered/walk_test.py` now plays new game -> bedroom -> stairs -> Pallet Town ->
-   Route 1 grass -> Oak's cutscene -> the lab (sheet `c_walk.png`). Next: pick a starter, rival battle, Viridian
-   Pokemon Center and Mart.
+   Route 1 grass -> Oak's cutscene -> the lab -> starter + Pokedex entry -> rival battle -> after the battle
+   (sheet `c_walk.png`). Next: Viridian Pokemon Center and Mart.
 
 ## For the morning
 

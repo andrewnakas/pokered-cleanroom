@@ -49,7 +49,7 @@
   "status": "gameplay-tested",
   "date": null,
   "browsers": [],
-  "scope": "Headless tests booted the live build with sound, started a new game and played from the bedroom through Pallet Town and Oak's cutscene into the lab; a test battle was run in a debug build of the same clean tree.",
+  "scope": "Headless tests booted the live build with sound, started a new game and played from the bedroom through Pallet Town and Oak's cutscene, chose a starter and fought the first rival battle.",
   "playthrough": false
  },
  "image": "/images/pokemon-red-blue.png"

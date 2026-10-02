@@ -67,11 +67,19 @@ def main(rom, outp):
     goto(7, 6); goto(3, 6); goto(3, 7); press("down", 20, 60); pb.tick(80, False); shot("outside")
     goto(5, 8); goto(10, 8); goto(10, 1); press("up", 20, 40)
     pb.tick(200, False); shot("grass")
-    for k in range(8):                         # Oak's cutscene, the lab, the first choices
-        for _ in range(45):
+    for _ in range(150):                       # Oak's cutscene up to "which POKeMON do you want?"
+        press("a", 4, 40)
+    for _ in range(6):
+        press("b", 4, 30)
+    shot("lab")
+    goto(5, 4); goto(6, 4); press("up", 10, 20)
+    press("a", 4, 60); shot("ball")
+    for k in range(6):                         # dex entry, yes, nickname no, rival picks, rival battle
+        for _ in range(40):
             press("a", 4, 40)
-        if k == 3:                             # in the lab: walk to the table of three balls
-            goto(6, 4); press("up", 10, 20)
+        press("b", 4, 40)
+        if k == 1:
+            goto(5, 6); goto(5, 8)             # walking away starts the rival battle
         shot(f"story{k}")
     pb.stop(save=False)
     s = 2
