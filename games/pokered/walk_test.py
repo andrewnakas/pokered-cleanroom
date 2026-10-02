@@ -49,6 +49,11 @@ def main(rom, outp):
             if m != m0 or (x, y) == (tx, ty):
                 return
             press("right" if x < tx else "left" if x > tx else "down" if y < ty else "up", 10, 14)
+            if pos() == (m, x, y):               # blocked: try the other axis
+                if y != ty:
+                    press("down" if y < ty else "up", 10, 14)
+                elif x != tx:
+                    press("right" if x < tx else "left", 10, 14)
         print(f"  goto({tx}, {ty}) stopped at {pos()}")
 
     pb.tick(900, False); press("start"); pb.tick(100, False); press("start"); pb.tick(60, False)
@@ -62,17 +67,22 @@ def main(rom, outp):
     goto(7, 6); goto(3, 6); goto(3, 7); press("down", 20, 60); pb.tick(80, False); shot("outside")
     goto(5, 8); goto(10, 8); goto(10, 1); press("up", 20, 40)
     pb.tick(200, False); shot("grass")
-    for _ in range(12):
-        press("a", 4, 50)
-    shot("oak")
+    for k in range(8):                         # Oak's cutscene, the lab, the first choices
+        for _ in range(45):
+            press("a", 4, 40)
+        if k == 3:                             # in the lab: walk to the table of three balls
+            goto(6, 4); press("up", 10, 20)
+        shot(f"story{k}")
     pb.stop(save=False)
     s = 2
-    sheet = Image.new("RGB", (len(shots) * (160 * s + 4) + 4, 144 * s + 18), (40, 44, 60))
+    cols = 7
+    rows = (len(shots) + cols - 1) // cols
+    sheet = Image.new("RGB", (cols * (160 * s + 4) + 4, rows * (144 * s + 18)), (40, 44, 60))
     d = ImageDraw.Draw(sheet)
     for n, (label, im) in enumerate(shots):
-        x = 4 + n * (160 * s + 4)
-        sheet.paste(im.resize((160 * s, 144 * s), Image.NEAREST), (x, 14))
-        d.text((x, 1), label, fill=(255, 230, 120))
+        x, y = 4 + (n % cols) * (160 * s + 4), (n // cols) * (144 * s + 18)
+        sheet.paste(im.resize((160 * s, 144 * s), Image.NEAREST), (x, y + 14))
+        d.text((x, y + 1), label, fill=(255, 230, 120))
     sheet.save(outp)
 
 
