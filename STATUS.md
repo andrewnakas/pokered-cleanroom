@@ -72,7 +72,8 @@ _Updated 2026-10-02 (first night)._
 3. Unidentified pieces: some slot reel fragments and battle effect shapes only got generic shading.
 4. Longer scripted play test: `games/pokered/walk_test.py` now plays new game -> bedroom -> stairs -> Pallet Town ->
    Route 1 grass -> Oak's cutscene -> the lab -> starter + Pokedex entry -> rival battle -> after the battle
-   (sheet `c_walk.png`). Next: Viridian Pokemon Center and Mart.
+   (sheet `c_walk.png`). Viridian City, its Pokemon Center and Mart, Pewter Gym, Viridian Forest and Mt Moon 1F
+   were checked as map renders from the clean tiles (`c_maps.png`), not yet walked in play.
 
 ## For the morning
 
