@@ -1,0 +1,56 @@
+{
+ "id": "pokemon-red-blue",
+ "title": "Pokémon Red and Blue",
+ "aliases": [
+  "pokered",
+  "pokeblue",
+  "pokemon-red",
+  "pokemon-blue"
+ ],
+ "year": 1996,
+ "genre": "RPG",
+ "kind": "Decompilation",
+ "mode": "embed",
+ "engine": "the pret/pokered disassembly on EmulatorJS (gambatte)",
+ "description": "Catch, train and battle 151 creatures across Kanto.",
+ "overview": "Pokémon Red and Blue running in the browser from the pret/pokered disassembly on EmulatorJS (gambatte). Every picture in the game — all 151 creatures front and back, trainers, sprites, tilesets, font and title art — has been redrawn by the clean-room pipeline from coarse facts, so the build ships no original ROM or artwork. Music and sound effects are the original note sequences played by the Game Boy sound channels.",
+ "source": "https://github.com/andrewnakas/pokered-cleanroom",
+ "engineLicense": "See the upstream project and the clean-room repository",
+ "assetLicense": "Regenerated clean-room assets; no retail data is distributed",
+ "assetRequirements": "No original game files needed.",
+ "controls": [
+  "Arrow keys — D-pad",
+  "X — A",
+  "Z — B",
+  "Enter — Start",
+  "Shift — Select",
+  "Gamepad — any standard controller, detected automatically",
+  "Touch — on-screen Game Boy pad on phones and tablets when no controller is connected"
+ ],
+ "saveInstructions": "Save from the in-game menu (Start, SAVE). The save is stored by the build in this browser, under andrewnakas.github.io. Clearing site data removes it. Red and Blue keep separate saves; pick the version with the Red / Blue buttons under the game.",
+ "limitations": [
+  "Regenerated pictures differ from the retail game by design.",
+  "Link cable trading and battles are not available in the browser."
+ ],
+ "inputs": [
+  "Gamepad",
+  "Keyboard",
+  "Touch"
+ ],
+ "downloadMB": 3,
+ "complete": false,
+ "color": "#d8433a",
+ "shelf": "cleanroom",
+ "platform": "Game Boy",
+ "launch": "embed",
+ "touch": true,
+ "embedUrl": "https://andrewnakas.github.io/pokered-cleanroom/",
+ "verification": {
+  "status": "gameplay-tested",
+  "date": null,
+  "browsers": [],
+  "scope": "Headless tests booted the build, started a new game, walked through Pallet Town and fought a battle.",
+  "playthrough": false
+ },
+ "image": "/images/pokemon-red-blue.png"
+}

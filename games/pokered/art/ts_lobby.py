@@ -76,7 +76,7 @@ def shelf32():
 def big_table():
     """32x32 eight-sided table on a foot (the plain middle tiles are not cut from here)."""
     c = C(32, 32, 0)
-    pts = [(8, 0), (24, 0), (32, 8), (32, 17), (25, 24), (21, 30), (11, 30), (7, 24), (0, 17), (0, 8)]
+    pts = [(8, 0), (24, 0), (32, 8), (32, 15), (26, 21), (21, 30), (11, 30), (6, 21), (0, 15), (0, 8)]
     c.poly(pts, 1, outline=3)
     c.line(8, 1, 1, 8, 0); c.hline(1, 8, 24, 0); c.vline(1, 8, 17, 0)
     c.line(24, 23, 20, 28, 2); c.line(30, 9, 30, 16, 2); c.line(24, 2, 30, 8, 2)

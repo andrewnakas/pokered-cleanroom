@@ -40,7 +40,7 @@ def person(m, grid, facing, opts):
     yy, xx = np.mgrid[0:16, 0:16]
     inner = m & (d >= 2)
     c = [((r[1] if r[1] is not None else 2.0) + (r[2] if r[2] is not None else 2.0)) / 2 for r in grid]
-    hair = opts.get("hair", _shade(c[0], 2.6, 2.15))
+    hair = opts.get("hair", 3 if c[0] >= 2.15 else 2)      # on screen 1 is white, 2 light grey, 3 black
     body = opts.get("top", _shade(c[2], 2.6, 2.0))
     legs = opts.get("legs", _shade(c[3], 2.6, 2.0))
     f[m] = 3
@@ -65,8 +65,18 @@ def person(m, grid, facing, opts):
         f[band & (ry == 8)] = 1
     f[inner & (ry >= 9) & (ry <= 12)] = body
     f[inner & (ry >= 13)] = legs
-    if body == 3:                                    # keep a dark top readable
-        f[inner & (ry >= 9) & (ry <= 12) & (d >= 3) & (xx == int(cx))] = 2
+    torso = inner & (ry >= 9) & (ry <= 12)
+    if facing != "side":                             # arms: a line each side of the chest, hands below
+        cols = np.nonzero(torso.any(0))[0]
+        if cols.size >= 7:
+            for xa, xh in ((cols[0] + 2, cols[0]), (cols[-1] - 2, cols[-1])):
+                f[torso & (xx == xa)] = 2 if body == 3 else 3
+                f[torso & (xx >= min(xa, xh)) & (xx <= max(xa, xh)) & (xx != xa) & (ry >= 11)] = 1
+    else:
+        f[torso & (xx == int(cx)) & (ry <= 11)] = 2 if body == 3 else 3
+    f[inner & (ry == 13) & (d >= 2)] = 3 if legs != 3 else 2      # belt
+    if facing != "side":
+        f[inner & (ry >= 14) & (xx == int(round(cx)))] = 3 if legs != 3 else 2
     f[bot][m[bot]] = 3
     return f
 

@@ -13,7 +13,7 @@ WALK = (0x1b, 0x23, 0x2c, 0x2d, 0x3b, 0x45)
 FACE_D = tex(lambda x, y: 3 if (x % 4 == 1 and (y + (x // 4) * 3) % 8 < 5) else (1 if (x % 4 == 3 and (y + x) % 8 == 2) else 2))
 ROOF = tex(lambda x, y: 2 if y % 4 == 3 else (2 if x == (2 if y < 4 else 6) else 1))
 SIDING = tex(lambda x, y: 1 if y % 4 == 3 else 0)
-LATTICE = tex(lambda x, y: 2 if x == y or x + y == 7 else 1)
+LATTICE = tex(lambda x, y: 3 if (x % 4 == 1 and y % 4 == 1) else (2 if (x + y) % 4 == 0 else 1))
 
 
 def boulder():

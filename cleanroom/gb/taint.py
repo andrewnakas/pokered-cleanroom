@@ -18,6 +18,8 @@ What counts as a coincidence (small low-colour tiles collide by chance):
   * in a silhouette picture, a tile whose interior (2+ pixels inside the kept outline) is one flat
     shade, or smaller than MIN_INTERIOR pixels: it is determined by the kept silhouette plus one
     shade;
+  * a rectilinear tile: at most 4 different rows and at most 4 different columns (box corners,
+    frames, bevelled edges: a few straight bands, the same in any drawing style);
   * a tile with at most SMALL_INK non-background pixels or at most 2 shades and SMALL_EDGES shade
     changes (a dot, a short stroke, a corner): too little content to be a copy.
 Everything else that matches is FAILING and must be redrawn.
@@ -50,6 +52,8 @@ def bars(t):
 
 def simple(t):
     if bars(t):
+        return True
+    if len({r.tobytes() for r in t}) <= 4 and len({c.tobytes() for c in t.T}) <= 4:
         return True
     vals, counts = np.unique(t, return_counts=True)
     if 64 - counts.max() <= SMALL_INK:

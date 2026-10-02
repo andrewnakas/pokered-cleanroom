@@ -103,6 +103,8 @@ def octagon():
     c.fill(top, 1, outline=3)
     y, x = c.grid()
     c.a[top & (y == 1)] = 0
+    inner = c.pmask([(18, 4), (46, 4), (60, 18), (60, 30), (46, 44), (18, 44), (4, 30), (4, 18)])
+    c.fill(inner, 1, outline=2)                       # inlaid rim on the table top
     for xx in (20, 28, 36, 44):
         c.vline(xx, 49, 55, 3)
     c.rect(18, 55, 21, 56, 3); c.rect(43, 55, 46, 56, 3)

@@ -93,12 +93,8 @@ def bubble():
 @drawer("emotes/happy.png")
 def emote_happy(rel, a):
     c = bubble()
-    c.put("#.#/.#.", 4, 4).put("#.#/.#.", 9, 4)          # arched eyes... drawn as carets
-    c.a[4:6, 4:7] = 1; c.a[4:6, 9:12] = 1
-    c.put(".#./#.#", 4, 4).put(".#./#.#", 9, 4)
-    c.a[4:6, 4:7][c.a[4:6, 4:7] == 0] = 1; c.a[4:6, 9:12][c.a[4:6, 9:12] == 0] = 1
-    c.put("#....#/.####.", 5, 7)
-    c.a[7:9, 5:11][c.a[7:9, 5:11] == 0] = 1
+    c.put(" # /# #", 4, 4).put(" # /# #", 9, 4)           # eyes
+    c.put("#    #/ #### ", 5, 7)                           # smile
     return c.a
 
 
@@ -136,8 +132,8 @@ def ball(kind):
         y, x = c.grid()
         c.a[inner & ((x + y) % 2 == 0)] = 2
     elif kind == "fainted":
-        for i in range(2, 6):
-            c.px(i, i + 1, 3); c.px(i, 8 - i, 3)
+        for k in range(-2, 3):
+            c.px(3 + k, 4 + k, 3); c.px(3 + k, 4 - k, 3)
     return c.a
 
 
@@ -222,12 +218,12 @@ def pokedex(rel, a):
     inch = C(8, 8).put(".##.##/.##.##/##.##./#..#..", 0, 0).a
     dot = C(8, 8).put("##/##", 3, 3).a
     hl = C(8, 8).rect(0, 3, 8, 5, 3).a
-    box = C(8, 8).rect(0, 3, 8, 5, 3).frame(1, 1, 7, 7, 3, fill=1).a
+    box = C(8, 8).rect(0, 3, 8, 5, 3).ellipse(4, 4, 3.4, 3.4, 1, outline=3).a
     left = ft[3].copy(); left[3:5, 4:] = 3
     right = ft[5].copy(); right[3:5, :4] = 3
     notch = ft[7].copy(); notch[2:4, 3:5] = 3
     vl = C(8, 8).rect(3, 0, 5, 8, 3).a
-    vbox = C(8, 8).rect(3, 0, 5, 8, 3).frame(1, 1, 7, 7, 3, fill=1).a
+    vbox = C(8, 8).rect(3, 0, 5, 8, 3).ellipse(4, 4, 3.4, 3.4, 1, outline=3).a
     return sheet([foot, inch, dot, ft[0], ft[1], ft[2], ft[3], ft[5], left, box, right, hl,
                   ft[6], notch, ft[8], ft[7], vbox, vl], a["w"], a["h"])
 
@@ -319,7 +315,7 @@ def badge_numbers(rel, a):
         c = C(8, 8)
         c.rect(0, 0, 8, 8, 1)
         g = art(G[d], 5, 7)
-        blit(c.a, g // 3 * 2, 2, 1, transparent=0)
+        c.hline(7, 0, 8, 2).vline(7, 0, 8, 2)
         blit(c.a, g, 1, 0, transparent=0)
         ts.append(c.a)
     return sheet(ts, a["w"], a["h"])
@@ -360,8 +356,7 @@ def _line(w, s, table=None, x=0, y=0, shade=3):
 @drawer("splash/copyright.png")
 def copyright(rel, a):
     c = C(a["w"], 8)
-    disc(c, 4, 4, 3.6, 0, outline=3)                        # (c)
-    c.put(".##/#../#../.##", 3, 2)
+    c.put(" ##### /#     #/#  ## #/# #   #/# #   #/#  ## #/#     #/ ##### ", 0, 0)   # (c)
     c.put("#/#", 9, 0); ntext(c, "9", 11, 0)                   # '9
     ntext(c, "5", 16, 0); c.rect(22, 5, 24, 7, 3)           # 5.
     ntext(c, "6", 24, 0); c.rect(30, 5, 32, 7, 3)           # 6.
@@ -454,7 +449,6 @@ def block_title(word, w, h, sx=3, sy=5, gap=2, y0=None):
     out[shift(o, 2, 2)] = 2
     out[o] = 3
     out[m] = 1
-    out[m & ~shift(m, 1, 1) & shift(o, 1, 1)] = 0           # lit top-left bevel
     return out
 
 
@@ -466,9 +460,9 @@ def pokemon_logo(rel, a):
     y = 47                                                  # a rule with a ball under the word
     c.rect(10, y, w - 10, y + 2, 3).hline(y + 2, 12, w - 8, 2)
     disc(c, w / 2, y + 1, 5.2, 1, outline=3)
-    c.hline(y + 1, w // 2 - 4, w // 2 + 4, 3)
-    c.a[y - 3:y + 1, :][(c.a[y - 3:y + 1, :] == 1) & (np.abs(np.arange(w) - w / 2 + 0.5) < 5)[None, :]] = 2
-    c.rect(w // 2 - 1, y, w // 2 + 1, y + 2, 0)
+    top = c.emask(w / 2, y + 1, 4, 4) & (c.grid()[0] < y)
+    c.a[top & (c.a == 1)] = 2
+    c.rect(w // 2 - 4, y, w // 2 + 4, y + 2, 3).rect(w // 2 - 1, y, w // 2 + 1, y + 2, 0)
     return c.a
 
 
@@ -493,10 +487,10 @@ SLOT_MAP = """
 def parse_map(text, cols):
     rows = []
     for ln in text.strip("\n").split("\n"):
-        toks = [ln[i:i + 3] for i in range(0, len(ln), 3)]
-        toks = [t for t in toks if t.strip()]
-        if ".. " in toks or ".." in [t.strip() for t in toks]:
-            k = [t.strip() for t in toks].index("..")
+        toks = [t for t in (ln[i:i + 3] for i in range(0, len(ln), 3)) if t.strip()]
+        names = [t.strip() for t in toks]
+        if ".." in names:
+            k = names.index("..")
             toks = toks[:k] + ["00 "] * (cols - len(toks) + 1) + toks[k + 1:]
         assert len(toks) == cols, (len(toks), ln)
         rows.append([(int(t[:2], 16), t[2:].strip()) for t in toks])
@@ -764,7 +758,7 @@ def red_canvas(word):
         base(x0, 3, 12)
         bar(x0, 3); bar(x0, 4)
         orn(x0, 6, 3 if top == "A" else 4)
-        (ic_flame if top == "A" else ic_leaf)(c, x0 + 16, 72, 7, 1, 2)
+        (ic_flame if top == "A" else ic_leaf)(c, x0 + 16, 64, 7, 1, 2)
         if top == "A":
             c.rect(x0 + 19, 75, x0 + 21, 77, 1)               # tile 37: a spark under the flame
         low(x0, 10); cap(x0, 11)
