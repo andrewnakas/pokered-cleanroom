@@ -168,6 +168,16 @@ def render(a, b):
     return out
 
 
+@drawer("intro/gengar.png")
+def intro_gengar(rel, a):
+    """Three poses side by side. The second tile of the first column is not part of the
+    figure: the intro uses it (tile 1) as the solid black of the letterbox bars."""
+    b = briefs().get(rel)
+    out = render(a, b) if b else drawn.autoshade(gfx.unpack_mask(a["sil"], a["h"], a["w"]), a["grid"])
+    out[8:16, 0:8] = 3
+    return out
+
+
 @drawer("pokemon/*/*.png")
 def creature(rel, a):
     b = briefs().get(rel)
