@@ -49,7 +49,7 @@
   "status": "gameplay-tested",
   "date": null,
   "browsers": [],
-  "scope": "Headless tests booted the build, started a new game, walked through Pallet Town and fought a battle.",
+  "scope": "Headless tests booted the live build with sound, started a new game and walked from the bedroom out into Pallet Town; a test battle was run in a debug build of the same clean tree.",
   "playthrough": false
  },
  "image": "/images/pokemon-red-blue.png"
